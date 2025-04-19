@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+    <style>
+      /* General Styles */
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      /* Header */
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+      }
+      nav ul {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+        margin-right: 100px;
+      }
+      nav ul li {
+        display: inline;
+      }
+      nav ul li a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        padding: 5px 10px;
+        transition: 0.3s;
+      }
+      nav ul li a:hover {
+        color: #007bff;
+      }
+      .btn {
+        background: #007bff;
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 5px;
+      }
+      /* Login Container */
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 350px;
+      }
+      
+      /* Heading */
+      h2 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+      
+      /* Form Styling */
+      .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .login-form input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      
+      /* Submit Button */
+      .login-form button {
+        background: #1e3c72;
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      
+      .login-form button:hover {
+        background: #2a5298;
+      }
+      
+      /* Links */
+      p {
+        margin-top: 15px;
+        font-size: 14px;
+      }
+      
+      p a {
+        color: #1e3c72;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      
+      p a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">ShopNow</div>
+      <nav>
+        <ul>
+          <li>
+            <a href="{% url 'index' %}">Home</a>
+          </li>
+          <li>
+            <a href="{% url 'index' %}">Services</a>
+          </li>
+          <li>
+            <a href="{% url 'index' %}">Features</a>
+          </li>
+          <li>
+            <a href="{% url 'signup' %}" class="btn">Sign Up</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="container">
+      <h2>Admin Login</h2>
+      <form method="post" class="login-form">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Admin Username" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+      <p>
+        <a href="{% url 'user_login' %}">User Login</a>
+      </p>
+    </div>
+  </body>
+</html>

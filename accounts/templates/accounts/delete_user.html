@@ -1,0 +1,78 @@
+{% extends "accounts/admin_dashboard.html" %}
+
+{% block content %}
+    <h2 class="delete-heading">Delete User</h2>
+
+    <div class="delete-container">
+        <p>Are you sure you want to delete <strong>{{ user.username }}</strong>? This action cannot be undone.</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="delete-btn">Yes, Delete</button>
+            <a href="{% url 'user_list' %}" class="cancel-btn">Cancel</a>
+        </form>
+    </div>
+
+{% endblock %}
+
+<style>
+    .delete-heading {
+        font-size: 2rem;
+        text-align: center;
+        color: #d9534f;
+        margin-bottom: 20px;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .delete-container {
+        max-width: 400px;
+        margin: auto;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    p {
+        font-size: 1.1rem;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .delete-btn {
+        background: #d9534f;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-right: 10px;
+    }
+
+    .delete-btn:hover {
+        background: #c9302c;
+    }
+
+    .cancel-btn {
+        background: #6c757d;
+        color: white;
+        padding: 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: 0.3s;
+    }
+
+    .cancel-btn:hover {
+        background: #5a6268;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(-20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+</style>

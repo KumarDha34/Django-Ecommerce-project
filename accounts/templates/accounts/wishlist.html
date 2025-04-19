@@ -1,0 +1,305 @@
+<head>
+    <!-- Link to Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            margin: 0;
+            padding-top: 80px;
+            transition: background-color 0.3s ease;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        header {
+            height: 80px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: box-shadow 0.3s ease-in-out;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header.scrolled {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        nav {
+            margin-right: 100px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        nav ul li {
+            display: inline-block;
+            position: relative;
+            text-decoration: none;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 8px 15px;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        nav ul li a:hover {
+            color: #007bff;
+            transform: translateY(-2px);
+        }
+
+        .dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 180px;
+            text-align: left;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .dropdown-content a:hover {
+            background: #f4f4f4;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn {
+            background: #007bff;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .wishlist-container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .wishlist-container:hover {
+            transform: scale(1.02);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 50px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            color: #555;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-size: 18px;
+        }
+
+        td {
+            background-color: #fff;
+            transition: background 0.3s ease-in-out;
+        }
+
+        tr:hover td {
+            background-color: #f1f1f1;
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease-in-out;
+            display: inline-block;
+            margin: 5px 10px;
+        }
+
+        a:hover {
+            transform: translateY(-2px);
+        }
+
+        .move-to-cart {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .move-to-cart:hover {
+            background-color: #218838;
+        }
+
+        .remove {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .remove:hover {
+            background-color: #c82333;
+        }
+
+        /* Icon Styling */
+        .nav-icon {
+            margin-right: 8px;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-icon:hover {
+            transform: rotate(15deg);
+        }
+
+        /* Profile Image */
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<header>
+    <h2>Welcome, {{ request.user.username }}</h2>
+    <nav>
+        <ul>
+            <li class="dropdown">
+                <a href="{% url 'user_dashboard' %}">
+                    <i class="fas fa-boxes nav-icon"></i> All Products ▼
+                </a>
+                <div class="dropdown-content">
+                    {% if categories %}
+                        {% for category in categories %}
+                            <a href="{% url 'category_products' category.id %}">
+                                <i class="fas fa-tag nav-icon"></i> {{ category.name }}
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <a href="#">No categories available</a>
+                    {% endif %}
+                </div>
+            </li>
+            <li>
+                <a href="{% url 'cart' %}">
+                    <i class="fas fa-shopping-cart nav-icon"></i> Cart
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'wishlist' %}">
+                    <i class="fas fa-heart nav-icon"></i> Wishlist
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'user_orders' %}">
+                    <i class="fas fa-box nav-icon"></i> Orders
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'profile' %}">
+                    <img src="{{ request.user.profile_picture.url }}" alt="Profile" class="profile-img">
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt nav-icon"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+{% if wishlist_items %}
+    <div class="wishlist-container">
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+            {% for item in wishlist_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>Rs. {{ item.product.price }}</td>
+                    <td>
+                        <a href="{% url 'move_to_cart' item.product.id %}" class="move-to-cart">
+                            <i class="fas fa-cart-plus nav-icon"></i> Move to Cart
+                        </a> |
+                        <a href="{% url 'remove_from_wishlist' item.product.id %}" class="remove">
+                            <i class="fas fa-trash nav-icon"></i> Remove
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% else %}
+    <p>Your wishlist is empty.</p>
+{% endif %}
+
+<script>
+    window.addEventListener('scroll', function () {
+        let header = document.querySelector('header');
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+</script>

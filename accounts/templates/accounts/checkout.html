@@ -1,0 +1,115 @@
+<h2>Checkout</h2>
+
+<div class="checkout-container">
+    {% if cart_items %}
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="address">Shipping Address:</label>
+            {{ form.address }}
+        </div>
+        <button type="submit">Proceed to Payment</button>
+        <a href="{% url 'user_dashboard' %}" class="cancel-btn">Cancel</a>
+    </form>
+
+    <h3>Total: Rs{{ total_amount }}</h3>
+    {% else %}
+    <p class="empty-cart-message">Your cart is empty. Please add products to proceed to checkout.</p>
+    {% endif %}
+</div>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        padding: 20px;
+        background-color: #4CAF50;
+        color: white;
+        margin-top: 0;
+    }
+
+    .checkout-container {
+        width: 80%;
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-size: 16px;
+        color: #333;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        margin-top: 5px;
+        box-sizing: border-box;
+    }
+
+    button {
+        padding: 12px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    .cancel-btn {
+        display: inline-block;
+        padding: 12px 20px;
+        background-color: #f44336;
+        color: white;
+        text-align: center;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 10px;
+        box-sizing: border-box;
+    }
+
+    .cancel-btn:hover {
+        background-color: #e53935;
+    }
+
+    h3 {
+        text-align: center;
+        color: #333;
+        font-size: 20px;
+        margin-top: 20px;
+    }
+
+    .empty-cart-message {
+        text-align: center;
+        font-size: 18px;
+        color: #ff6347;
+        margin-top: 20px;
+    }
+</style>

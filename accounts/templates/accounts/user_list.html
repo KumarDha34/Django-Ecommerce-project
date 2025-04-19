@@ -1,0 +1,210 @@
+<!-- accounts/templates/accounts/user_list.html -->
+{% extends 'accounts/admin_dashboard.html' %}
+
+{% block content %}
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    .container {
+      width: 90%;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+    
+    thead {
+      background: #007bff;
+      color: white;
+    }
+    
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    tbody tr {
+      transition: background 0.3s ease-in-out;
+    }
+    
+    tbody tr:hover {
+      background: #f2f2f2;
+    }
+    
+    td {
+      color: #555;
+    }
+    
+    .no-users {
+      text-align: center;
+      padding: 15px;
+      font-style: italic;
+      color: #999;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .edit-btn,
+    .delete-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    
+    .edit-btn {
+      background: #28a745;
+      color: white;
+    }
+    
+    .edit-btn:hover {
+      background: #218838;
+      transform: scale(1.1);
+    }
+    
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .delete-btn:hover {
+      background: #c82333;
+      transform: scale(1.1);
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    table,
+    h2 {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    /* Pagination styles */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      list-style: none;
+    }
+
+    .pagination li {
+      margin: 0 5px;
+    }
+
+    .pagination a {
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      background: white;
+      text-decoration: none;
+      color: #333;
+      border-radius: 5px;
+      transition: background 0.3s ease-in-out;
+    }
+
+    .pagination a:hover {
+      background: #007bff;
+      color: white;
+    }
+
+    .pagination .active {
+      font-weight: bold;
+      background: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+    }
+  </style>
+
+  <div class="container">
+    <h2>User List</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="3" class="no-users">No users found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    {% if users.has_other_pages %}
+      <ul class="pagination">
+        {% if users.has_previous %}
+          <li><a href="?page=1">&laquo; First</a></li>
+          <li><a href="?page={{ users.previous_page_number }}">Previous</a></li>
+        {% endif %}
+
+        {% for num in users.paginator.page_range %}
+          {% if users.number == num %}
+            <li class="active">{{ num }}</li>
+          {% elif num > users.number|add:"-3" and num < users.number|add:"3" %}
+            <li><a href="?page={{ num }}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if users.has_next %}
+          <li><a href="?page={{ users.next_page_number }}">Next</a></li>
+          <li><a href="?page={{ users.paginator.num_pages }}">Last &raquo;</a></li>
+        {% endif %}
+      </ul>
+    {% endif %}
+  </div>
+
+  <script>
+    function confirmDelete(username) {
+      return confirm("Are you sure you want to delete user '{{ username }}'?")
+    }
+  </script>
+
+{% endblock %}

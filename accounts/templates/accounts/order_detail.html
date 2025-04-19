@@ -1,0 +1,134 @@
+{% block content %}
+<h2>Order #{{ order.id }} Details</h2>
+
+<!-- Order Information Section -->
+<div class="order-info">
+    <p><strong>Customer:</strong> {{ order.user.username }}</p>
+    <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+    <p><strong>Order Date:</strong> {{ order.order_date|date:"Y-m-d H:i" }}</p>
+    <p><strong>Status:</strong> {{ order.status }}</p>
+</div>
+
+<h3>Ordered Items</h3>
+
+<!-- Order Items Table -->
+<table class="order-items-table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order_items %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.item_total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Total Price -->
+<div class="total-price">
+    <p><strong>Total Price:</strong> ${{ order.total_price }}</p>
+</div>
+
+<!-- Navigation Back to Orders -->
+<div class="back-link">
+    <a href="{% url 'admin_manage_orders' %}" class="btn-back">Back to Orders</a>
+</div>
+
+{% endblock %}
+
+<!-- Add some CSS -->
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+        margin: 20px;
+    }
+
+    h2 {
+        color: #333;
+    }
+
+    .order-info {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .order-info p {
+        margin: 8px 0;
+        font-size: 14px;
+    }
+
+    h3 {
+        margin-top: 40px;
+        color: #333;
+    }
+
+    /* Styling for the Order Items Table */
+    .order-items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .order-items-table th, .order-items-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .order-items-table th {
+        background-color: #f8f9fa;
+    }
+
+    .order-items-table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Total Price Section */
+    .total-price {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    .total-price p {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    /* Back Button */
+    .back-link {
+        margin-top: 20px;
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .btn-back:hover {
+        background-color: #0056b3;
+    }
+</style>

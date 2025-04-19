@@ -1,0 +1,97 @@
+{% extends "accounts/admin_dashboard.html" %}
+
+{% block content %}
+<div class="add-category-container">
+    <h2>Add Category</h2>
+    <form method="POST" class="category-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-btn">Add Category</button>
+    </form>
+</div>
+
+<style>
+    /* Container for the Add Category Form */
+    .add-category-container {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 40px;
+        max-width: 600px;
+        margin: 40px auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    /* Animation for form appearing */
+    .add-category-container.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    /* Styling for the form */
+    .category-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .category-form p {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    /* Style the input fields */
+    .category-form input, .category-form select {
+        padding: 12px;
+        font-size: 1rem;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    /* Input fields focus animation */
+    .category-form input:focus, .category-form select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    /* Style the submit button */
+    .submit-btn {
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .submit-btn:active {
+        transform: translateY(1px);
+    }
+</style>
+
+<script>
+    // Add animation for the form when it loads
+    document.addEventListener("DOMContentLoaded", function() {
+        const formContainer = document.querySelector('.add-category-container');
+        formContainer.classList.add('show');
+    });
+</script>
+
+{% endblock %}

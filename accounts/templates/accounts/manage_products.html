@@ -1,0 +1,310 @@
+{% extends "accounts/admin_dashboard.html" %}
+
+{% block content %}
+    <h2 class="page-title">Manage Products</h2>
+
+    <form method="GET" class="filter-form">
+        <input type="text" name="search" placeholder="Search Products" value="{{ request.GET.search }}">
+        <select name="category">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+    <div class="table-container">
+        <table class="product-table">
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category.name }}</td>
+                <td>Rs.{{ product.price }}</td>
+                <td>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                    {% else %}
+                        No Image
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a href="{% url 'edit_product' product.id %}" class="edit-btn">Edit</a>  
+                    <a href="{% url 'delete_product' product.id %}" class="delete-btn">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="no-products">No products available</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% if products.has_other_pages %}
+    <ul class="pagination">
+        {% if products.has_previous %}
+            <li><a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">&laquo; First</a></li>
+            <li><a href="?page={{ products.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Previous</a></li>
+        {%endif%}
+        {% for num in products.paginator.page_range %}
+            {% if products.number == num %}
+                <li class="active">{{ num }}</li>
+            {% elif num > products.number|add:"-3" and num < products.number|add:"3" %}
+                <li><a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">{{ num }}</a></li>                {% endif %}
+        {% endfor %}
+        {% if products.has_next %}
+            <li><a href="?page={{ products.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Next</a></li>
+            <li><a href="?page={{ products.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Last &raquo;</a></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+{% endblock %}
+
+{% block extra_head %}
+    <style>
+        /* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Page Title */
+.page-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Table Container */
+.table-container {
+    max-width: 90%;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    animation: slideUp 1s ease-in-out;
+    overflow-x: auto;
+}
+
+/* Product Table */
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+}
+
+.product-table th,
+.product-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.product-table th {
+    background: #007bff;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.product-table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.product-table tr:hover {
+    background: #e3f2fd;
+    transition: 0.3s;
+}
+
+/* Product Image */
+.product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+    transform: scale(1.1);
+}
+
+/* No Products Message */
+.no-products {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #999;
+    padding: 20px;
+}
+
+/* Search & Filter Form */
+.filter-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-form input,
+.filter-form select,
+.filter-form button {
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.filter-form button {
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.filter-form button:hover {
+    background: #0056b3;
+}
+
+/* Action Buttons */
+.edit-btn,
+.delete-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    margin: 2px;
+    transition: 0.3s ease;
+}
+
+.edit-btn {
+    background: #28a745;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #218838;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .table-container {
+        max-width: 100%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .product-table th,
+    .product-table td {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .product-image {
+        width: 40px;
+        height: 40px;
+    }
+
+    .edit-btn,
+    .delete-btn {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .filter-form {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .filter-form input,
+    .filter-form select,
+    .filter-form button {
+        width: 100%;
+    }
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    list-style: none;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination a {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    background: white;
+    text-decoration: none;
+    color: #333;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+}
+
+.pagination a:hover {
+    background: #007bff;
+    color: white;
+}
+
+.pagination .active {
+    font-weight: bold;
+    background: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+    </style>
+{% endblock %}
