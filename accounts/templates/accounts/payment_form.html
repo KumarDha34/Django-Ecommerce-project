@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eSewa Payment</title>
+</head>
+<body>
+    <h2>Redirecting to eSewa Payment Gateway...</h2>
+    <form action="https://rc.esewa.com.np/epay/main" method="POST" id="payment_form">
+        <input type="hidden" name="amt" value="{{ amt }}">
+        <input type="hidden" name="txAmt" value="0">
+        <input type="hidden" name="psc" value="0">
+        <input type="hidden" name="pdc" value="0">
+        <input type="hidden" name="tAmt" value="{{ amt }}">
+        <input type="hidden" name="pid" value="{{ pid }}">
+        <input type="hidden" name="scd" value="{{ scd }}">
+        <input type="hidden" name="su" value="{{ su }}">
+        <input type="hidden" name="fu" value="{{ fu }}">
+        <input type="hidden" name="signature" value="{{ signature }}">
+        <button type="submit" style="display:none;">Proceed to eSewa Payment</button>
+    </form>
+
+    <script>
+        // Automatically submit the form to eSewa
+        document.getElementById('payment_form').submit();
+    </script>
+</body>
+</html>
