@@ -1,134 +1,143 @@
+{% extends 'accounts/admin_dashboard.html' %}
+{% load static %}
 {% block content %}
-<h2>Order #{{ order.id }} Details</h2>
-
-<!-- Order Information Section -->
-<div class="order-info">
-    <p><strong>Customer:</strong> {{ order.user.username }}</p>
-    <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
-    <p><strong>Order Date:</strong> {{ order.order_date|date:"Y-m-d H:i" }}</p>
-    <p><strong>Status:</strong> {{ order.status }}</p>
-</div>
-
-<h3>Ordered Items</h3>
-
-<!-- Order Items Table -->
-<table class="order-items-table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in order_items %}
-        <tr>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>${{ item.item_total }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<!-- Total Price -->
-<div class="total-price">
-    <p><strong>Total Price:</strong> ${{ order.total_price }}</p>
-</div>
-
-<!-- Navigation Back to Orders -->
-<div class="back-link">
-    <a href="{% url 'admin_manage_orders' %}" class="btn-back">Back to Orders</a>
-</div>
-
-{% endblock %}
-
-<!-- Add some CSS -->
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f4f4;
-        margin: 20px;
-    }
-
-    h2 {
-        color: #333;
-    }
-
-    .order-info {
-        background-color: white;
+    .order-detail {
         padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin: 20px;
+        font-family: 'Segoe UI', sans-serif;
     }
 
-    .order-info p {
-        margin: 8px 0;
+    .order-detail h2 {
+        font-size: 26px;
+        margin-bottom: 10px;
+        color: #343a40;
+    }
+
+    .order-section {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .order-section h3 {
+        font-size: 20px;
+        color: #495057;
+        margin-bottom: 10px;
+    }
+
+    .order-section p,
+    .order-section li {
+        font-size: 16px;
+        margin: 6px 0;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 500;
         font-size: 14px;
     }
 
-    h3 {
-        margin-top: 40px;
-        color: #333;
+    .status-Pending {
+        background-color: #ffc107;
     }
 
-    /* Styling for the Order Items Table */
-    .order-items-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-        background-color: white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    .status-Shipped {
+        background-color: #17a2b8;
     }
 
-    .order-items-table th, .order-items-table td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
+    .status-Delivered {
+        background-color: #28a745;
     }
 
-    .order-items-table th {
-        background-color: #f8f9fa;
+    form select {
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
     }
 
-    .order-items-table tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    /* Total Price Section */
-    .total-price {
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
-    }
-
-    .total-price p {
-        font-size: 16px;
-        font-weight: bold;
-    }
-
-    /* Back Button */
-    .back-link {
-        margin-top: 20px;
-    }
-
-    .btn-back {
-        padding: 10px 20px;
+    form button {
+        padding: 6px 14px;
         background-color: #007bff;
         color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-left: 10px;
+        transition: background-color 0.3s;
     }
 
-    .btn-back:hover {
+    form button:hover {
         background-color: #0056b3;
     }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
 </style>
+
+<div class="order-detail">
+    <h2>Order #{{ order.id }}</h2>
+
+    <div class="order-section">
+        <p><strong>User:</strong> {{ order.user.username }}</p>
+        <p><strong>Status:</strong>
+            <span class="status-badge status-{{ order.status }}">{{ order.status }}</span>
+        </p>
+        <p><strong>Total:</strong> Rs. {{ order.total_price }}</p>
+        <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+        <p><strong>Transaction Code:</strong> {{ order.transaction_code|default:"N/A" }}</p>
+        <p><strong>Order Date:</strong> {{ order.order_date|date:"Y-m-d H:i" }}</p>
+    </div>
+
+    <div class="order-section">
+        <h3>Items</h3>
+        <ul>
+            {% for item in items %}
+            <li>{{ item.product.name }} - {{ item.quantity }} × Rs.{{ item.product.price }} = Rs{{ item.item_total }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="order-section">
+        <h3>Payment Info</h3>
+        {% if payment %}
+        <p><strong>Method:</strong> {{ payment.payment_method }}</p>
+        <p><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
+        <p><strong>Amount:</strong> Rs.{{ payment.amount }}</p>
+        <p><strong>Status:</strong> {{ payment.payment_status }}</p>
+        {% else %}
+        <p>No payment details.</p>
+        {% endif %}
+    </div>
+
+    <div class="order-section">
+        <h3>Update Status</h3>
+        <form method="post" action="{% url 'update_order_status' order.id %}">
+            {% csrf_token %}
+            <select name="status">
+                <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+            </select>
+            <button type="submit"><i class="fas fa-sync-alt"></i> Update</button>
+        </form>
+    </div>
+
+    <a href="{% url 'admin_orders' %}" class="back-link">← Back to orders</a>
+</div>
+{% endblock %}
