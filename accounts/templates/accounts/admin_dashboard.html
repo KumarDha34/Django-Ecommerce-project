@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Custom Styles -->
     {% block extra_head %}{% endblock %}
-    
     <style>
         * {
             margin: 0;
@@ -24,10 +21,9 @@
 
         body {
             display: flex;
-            background: #f4f4f4;
+            background: #f0f2f5;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: 250px;
             height: 100vh;
@@ -39,25 +35,22 @@
         }
 
         .sidebar h2 {
-            color: white;
             text-align: center;
             margin-bottom: 20px;
         }
 
         .sidebar ul {
             list-style: none;
-            padding: 0;
         }
 
         .sidebar ul li {
             padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .sidebar ul li a {
-            text-decoration: none;
             color: white;
+            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -65,43 +58,111 @@
 
         .sidebar ul li:hover {
             background: #007bff;
-            padding: 15px;
-            border-radius: 5px;
         }
 
-        .sidebar ul li a i {
-            width: 20px;
-        }
-
-        /* Dropdown Styles */
         .sidebar .dropdown {
             display: none;
-            list-style: none;
+            background: #495057;
             padding-left: 20px;
-            background: #444;
         }
 
-        .sidebar .dropdown li {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar .dropdown li a {
-            padding: 10px 15px;
-            text-decoration: none;
-            color: white;
+        .sidebar ul li:hover .dropdown {
             display: block;
         }
 
-        .sidebar .dropdown li a:hover {
-            background: #007bff;
-        }
-
-        /* Main Content */
         .main-content {
             margin-left: 250px;
             padding: 20px;
-            flex-grow: 1;
+            flex: 1;
+        }
+
+        .dashboard-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .stat-card h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .recent-activity, .analytics, .alerts {
+            margin-bottom: 30px;
+        }
+
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .recent-table th, .recent-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .recent-table th {
+            background: #007bff;
+            color: white;
+        }
+
+        .recent-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .recent-table a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .alerts ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .alerts ul li {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #007bff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .logout {
@@ -114,134 +175,34 @@
         .logout a {
             color: red;
             font-weight: bold;
-        }
-
-        /* Dashboard Overview */
-        .dashboard-overview {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            flex: 1;
-        }
-
-        .stat-card h3 {
-            margin-bottom: 10px;
-            font-size: 18px;
-            color: #333;
-        }
-
-        .stat-card p {
-            font-size: 24px;
-            color: #007bff;
-            font-weight: bold;
-        }
-
-        /* Recent Activity Table */
-        .recent-activity {
-            margin-bottom: 30px;
-        }
-
-        .recent-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .recent-table th, .recent-table td {
-            padding: 12px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-
-        .recent-table th {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .recent-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .recent-table tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        .recent-table a {
             text-decoration: none;
-            color: #007bff;
-        }
-
-        .recent-table a:hover {
-            text-decoration: underline;
-        }
-
-        /* Sales Analytics */
-        .analytics {
-            margin-bottom: 30px;
-        }
-
-        .chart-container {
-            width: 100%;
-            height: 300px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Alerts Section */
-        .alerts ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .alerts ul li {
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-
-        .alerts ul li:last-child {
-            margin-bottom: 0;
         }
     </style>
 </head>
 <body>
-    {% block sidebar %}
+
+    <!-- Sidebar -->
+     {% block sidebar %}
     <div class="sidebar">
         <h2>Admin Panel</h2>
         <ul>
             <li><a href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             <li><a href="{% url 'user_list' %}"><i class="fas fa-users"></i> Users</a></li>
             <li>
-                <a href="#" id="productsLink"><i class="fas fa-box"></i> Products</a>
-                <!-- Dropdown for Products -->
-                <ul class="dropdown" id="productsDropdown">
+                <a href="#"><i class="fas fa-box"></i> Products</a>
+                <ul class="dropdown">
                     <li><a href="{% url 'add_product' %}">Add Product</a></li>
                     <li><a href="{% url 'manage_products' %}">Manage Products</a></li>
                 </ul>
             </li>
-            
             <li>
-                <a href="{% url 'admin_manage_orders' %}" id="ordersLink"><i class="fas fa-shopping-cart"></i> Orders</a>
-            </li>
-            <li id="categoriesLink">
                 <a href="#"><i class="fas fa-tags"></i> Categories</a>
-                <ul class="dropdown" id="categoriesDropdown">
+                <ul class="dropdown">
                     <li><a href="{% url 'add_category' %}">Add Category</a></li>
                     <li><a href="{% url 'manage_categories' %}">Manage Categories</a></li>
                 </ul>
-            </li>            
-            <li><i class="fas fa-cog"></i> Settings</li>
+            </li>
+            <li><a href="{% url 'admin_orders' %}"><i class="fas fa-shopping-cart"></i> Orders</a></li>
         </ul>
 
         <div class="logout">
@@ -250,32 +211,44 @@
     </div>
     {% endblock %}
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <div class="main-content">
         {% block content %}
         <h2>Admin Dashboard</h2>
 
-        <!-- Dashboard Overview -->
+        <!-- Overview -->
         <div class="dashboard-overview">
             <div class="stat-card">
+                <i class="fas fa-users"></i>
                 <h3>Total Users</h3>
                 <p>{{ total_users }}</p>
             </div>
             <div class="stat-card">
+                <i class="fas fa-boxes"></i>
                 <h3>Total Products</h3>
                 <p>{{ total_products }}</p>
             </div>
             <div class="stat-card">
+                <i class="fas fa-shopping-cart"></i>
                 <h3>Total Orders</h3>
                 <p>{{ total_orders }}</p>
             </div>
             <div class="stat-card">
+                <i class="fas fa-clock"></i>
                 <h3>Pending Orders</h3>
                 <p>{{ pending_orders }}</p>
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Sales Analytics -->
+        <div class="analytics">
+            <h3>Sales Analytics (Last 4 Months)</h3>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
         <div class="recent-activity">
             <h3>Recent Orders</h3>
             <table class="recent-table">
@@ -295,80 +268,46 @@
                         <td>{{ order.user.username }}</td>
                         <td>{{ order.status }}</td>
                         <td>Rs.{{ order.total_price }}</td>
-                        <td><a href="{% url 'admin_order_detail' order.id %}">View</a></td>
+                        <td><a href="#">View</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- Tasks/Alerts Section -->
+        <!-- Alerts -->
         <div class="alerts">
             <h3>Pending Tasks</h3>
             <ul>
-                <li>Pending Orders: {{ pending_orders }}</li>
-                <li>Low Stock Products: {{ low_stock_products }}</li>
-                <li>Users Awaiting Approval: {{ awaiting_approval }}</li>
+                <li><i class="fas fa-exclamation-circle"></i> Pending Orders: {{ pending_orders }}</li>
             </ul>
         </div>
         {% endblock %}
     </div>
 
+    <!-- Chart.js Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var categoriesLink = document.getElementById('categoriesLink');
-            var categoriesDropdown = document.getElementById('categoriesDropdown');
-            var productsLink = document.getElementById('productsLink');
-            var productsDropdown = document.getElementById('productsDropdown');
-    
-            categoriesDropdown.style.display = 'none';
-            productsDropdown.style.display = 'none';
-    
-            categoriesLink.addEventListener('click', function(event) {
-                event.preventDefault();
-                categoriesDropdown.style.display = (categoriesDropdown.style.display === 'none') ? 'block' : 'none';
-            });
-
-            // Toggle the Products dropdown
-            productsLink.addEventListener('click', function(event) {
-                event.preventDefault();
-                productsDropdown.style.display = (productsDropdown.style.display === 'none') ? 'block' : 'none';
-            });
-    
-            // Allow navigation on dropdown clicks
-            document.querySelectorAll('.dropdown a').forEach(function(link) {
-                link.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    window.location.href = this.href;
-                });
-            });
-
-            document.addEventListener('DOMContentLoaded', function() {
-                // Prepare sales data
-                var salesData = {
-                    labels: {{ sales_labels|safe }},
-                    datasets: [{
-                        label: 'Sales Over Time',
-                        data: {{ sales_data|safe }},
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                };
-        
-                var ctx = document.getElementById('salesChart').getContext('2d');
-                var salesChart = new Chart(ctx, {
-                    type: 'line',  // You can change the chart type if needed (e.g., bar, line, etc.)
-                    data: salesData,
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ sales_labels|safe }},
+                datasets: [{
+                    label: 'Sales in Rs.',
+                    data: {{ sales_data|safe }},
+                    backgroundColor: '#007bff',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
-                });
-            });
+                }
+            }
+        });
     </script>
 </body>
 </html>
