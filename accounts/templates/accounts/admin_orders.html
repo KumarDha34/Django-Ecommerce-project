@@ -1,69 +1,76 @@
 {% extends 'accounts/admin_dashboard.html' %}
 {% load static %}
 {% block content %}
+
 <style>
-    .orders-container {
+    .orders-wrapper {
+        padding: 40px;
+        background: #f4f6f9;
+        min-height: 100vh;
+    }
+
+    .order-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+    }
+
+    .order-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
         padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        margin: 20px;
-    }
-
-    .orders-header {
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
+        transition: transform 0.3s ease;
+        position: relative;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .order-header {
+        display: flex;
         align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
     }
 
-    .orders-header h2 {
+    .order-header i {
+        font-size: 22px;
+        color: #007bff;
+    }
+
+    .order-title {
+        font-size: 18px;
+        font-weight: 600;
         color: #343a40;
-        font-size: 28px;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        background-color: #fff;
-        border-radius: 8px;
-        overflow: hidden;
+    .order-meta {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    thead {
-        background-color: #343a40;
-        color: #fff;
-    }
-
-    th, td {
-        padding: 12px 15px;
-        text-align: center;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    tbody tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    a.view-link {
-        background-color: #007bff;
-        color: #fff;
-        padding: 6px 12px;
-        border-radius: 4px;
-        text-decoration: none;
-        transition: 0.3s;
-    }
-
-    a.view-link:hover {
-        background-color: #0056b3;
+    .order-meta i {
+        color: #6c757d;
     }
 
     .status-badge {
-        padding: 5px 10px;
-        border-radius: 12px;
-        color: #fff;
-        font-size: 13px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        color: white;
         font-weight: 500;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .status-Pending {
@@ -77,42 +84,80 @@
     .status-Delivered {
         background-color: #28a745;
     }
+
+    .view-btn {
+        align-self: flex-start;
+        margin-top: 15px;
+        background-color: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .view-btn i {
+        margin-right: 6px;
+    }
+
+    .view-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .no-orders {
+        text-align: center;
+        font-size: 18px;
+        color: #888;
+        margin-top: 40px;
+    }
+
+    .orders-title {
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 40px;
+        color: #333;
+    }
+
 </style>
 
-<div class="orders-container">
-    <div class="orders-header">
-        <h2><i class="fas fa-shopping-cart"></i> Manage Orders</h2>
-    </div>
+<div class="orders-wrapper">
+    <h2 class="orders-title"><i class="fas fa-boxes"></i> Manage Orders</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>User</th>
-                <th>Total (Rs)</th>
-                <th>Status</th>
-                <th>Ordered On</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-            <tr>
-                <td>#{{ order.id }}</td>
-                <td>{{ order.user.username }}</td>
-                <td>Rs. {{ order.total_price }}</td>
-                <td>
-                    <span class="status-badge status-{{ order.status }}">{{ order.status }}</span>
-                </td>
-                <td>{{ order.order_date|date:"Y-m-d H:i" }}</td>
-                <td>
-                    <a href="{% url 'order_detail' order.id %}" class="view-link"><i class="fas fa-eye"></i> View</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6">No orders found.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if orders %}
+    <div class="order-grid">
+        {% for order in orders %}
+        <div class="order-card">
+            <div>
+                <div class="order-header">
+                    <i class="fas fa-receipt"></i>
+                    <div class="order-title">Order #{{ order.id }} — {{ order.user.username }}</div>
+                </div>
+                <div class="order-meta"><i class="fas fa-rupee-sign"></i> Rs. {{ order.total_price }}</div>
+                <div class="order-meta"><i class="fas fa-calendar-alt"></i> {{ order.order_date|date:"Y-m-d H:i" }}</div>
+                <div class="order-meta">
+                    <span class="status-badge status-{{ order.status }}">
+                        {% if order.status == "Pending" %}
+                            <i class="fas fa-clock"></i>
+                        {% elif order.status == "Shipped" %}
+                            <i class="fas fa-shipping-fast"></i>
+                        {% elif order.status == "Delivered" %}
+                            <i class="fas fa-check-circle"></i>
+                        {% endif %}
+                        {{ order.status }}
+                    </span>
+                </div>
+            </div>
+            <a href="{% url 'order_detail' order.id %}" class="view-btn">
+                <i class="fas fa-eye"></i> View Details
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="no-orders"><i class="fas fa-box-open"></i> No orders found.</div>
+    {% endif %}
 </div>
+
 {% endblock %}
