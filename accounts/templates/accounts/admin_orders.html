@@ -1,0 +1,118 @@
+{% extends 'accounts/admin_dashboard.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .orders-container {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin: 20px;
+    }
+
+    .orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .orders-header h2 {
+        color: #343a40;
+        font-size: 28px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    thead {
+        background-color: #343a40;
+        color: #fff;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    a.view-link {
+        background-color: #007bff;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    a.view-link:hover {
+        background-color: #0056b3;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .status-Pending {
+        background-color: #ffc107;
+    }
+
+    .status-Shipped {
+        background-color: #17a2b8;
+    }
+
+    .status-Delivered {
+        background-color: #28a745;
+    }
+</style>
+
+<div class="orders-container">
+    <div class="orders-header">
+        <h2><i class="fas fa-shopping-cart"></i> Manage Orders</h2>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Total (Rs)</th>
+                <th>Status</th>
+                <th>Ordered On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.user.username }}</td>
+                <td>Rs. {{ order.total_price }}</td>
+                <td>
+                    <span class="status-badge status-{{ order.status }}">{{ order.status }}</span>
+                </td>
+                <td>{{ order.order_date|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'order_detail' order.id %}" class="view-link"><i class="fas fa-eye"></i> View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No orders found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

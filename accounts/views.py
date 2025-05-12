@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import CustomUser,Category,Product,Cart,Wishlist,Order,OrderItem
+from .models import CustomUser,Category,Product,Cart,Wishlist,Order,OrderItem,Payment
 from django import forms
 from .forms import CategoryForm,ProductForm,ShippingForm,ProfileUpdateForm
 from django.contrib.auth.models import User
@@ -11,6 +11,8 @@ import datetime
 from django.db import models
 from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 import uuid,requests
+from django.conf import settings
+from decimal import Decimal
 # Index View (Home Page)
 def index(request):
     return render(request, 'accounts/index.html')
@@ -94,55 +96,45 @@ def user_dashboard(request):
 
 @login_required
 def admin_dashboard(request):
-    # Check if the user is an admin
     if not request.user.is_admin:
         return redirect('user_dashboard')
-    
-    # Fetch statistics for the dashboard
-    total_users = CustomUser.objects.count()  # Total users
-    total_products = Product.objects.count()  # Total products
-    total_orders = Order.objects.count()  # Total orders
-    pending_orders = Order.objects.filter(status='Pending').count()  # Pending orders
 
-    # Additional statistics (e.g., low stock products, awaiting approval)
-    # low_stock_products = Product.objects.filter(stock__lte=5).count()  # Low stock products (ensure you have a stock field in Product)
-    awaiting_approval = CustomUser.objects.filter(is_active=False).count()  # Users awaiting approval
+    total_users = CustomUser.objects.filter(is_admin=False).count()
+    total_products = Product.objects.count()
+    total_orders = Order.objects.count()
+    pending_orders = Order.objects.filter(status='Pending').count()
+    shipped_products = Order.objects.filter(status='Shipped').count()
+    delivered_products = Order.objects.filter(status='Delivered').count()
+    awaiting_approval = CustomUser.objects.filter(is_active=False).count()
+    recent_orders = Order.objects.order_by('-order_date')[:5]
 
-    # Fetch recent orders (optional)
-    recent_orders = Order.objects.all().order_by('-order_date')  # Get 5 most recent orders
+    # Sales data for chart (last 4 months)
+    sales_labels = []
+    sales_data = []
+    current_date = timezone.now()
 
-    # Sales Data (example for monthly sales)
-    sales_labels = []  # To hold months (or any period you want)
-    sales_data = []    # To hold the total sales for each month
+    for i in range(3, -1, -1):
+        date = current_date - datetime.timedelta(days=30 * i)
+        month = date.month
+        year = date.year
+        label = datetime.datetime(year, month, 1).strftime('%B')
 
-     # Calculate sales for the past 4 months (adjust as needed)
-    current_month = timezone.now().month
-    for i in range(4):
-        month = (current_month - i) % 12
-        year = timezone.now().year
-        if month == 0:
-            month = 12
-            year -= 1
-
-        # Add month name to sales_labels
-        sales_labels.append(datetime.datetime(year, month, 1).strftime('%B'))
-
-        # Calculate the total sales for this month
         total_sales = Order.objects.filter(
             order_date__month=month,
             order_date__year=year
-        ).aggregate(total_sales=models.Sum('total_price'))['total_sales'] or 0
+        ).aggregate(total=models.Sum('total_price'))['total'] or 0
 
-        sales_data.append(total_sales)
-    # Pass all the data to the template
+        sales_labels.append(label)
+        sales_data.append(float(total_sales))
+
     context = {
         'total_users': total_users,
         'total_products': total_products,
         'total_orders': total_orders,
         'pending_orders': pending_orders,
-        # 'low_stock_products': low_stock_products,
-        'awaiting_approval': awaiting_approval,
         'recent_orders': recent_orders,
+        'sales_labels': sales_labels,
+        'sales_data': sales_data,
     }
 
     return render(request, 'accounts/admin_dashboard.html', context)
@@ -226,6 +218,7 @@ def user_list(request):
 
     return render(request, 'accounts/user_list.html', {'users': users})
 
+@login_required
 def delete_user(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if request.method == "POST":
@@ -397,56 +390,172 @@ def move_to_cart(request, product_id):
     return redirect("cart")
 
 @login_required
-def checkout(request):
+def proceed_to_checkout(request):
     cart_items = Cart.objects.filter(user=request.user)
 
     if not cart_items.exists():
-        return redirect("cart")
+        messages.error(request, "Your cart is empty.")
+        return redirect('cart')  # Replace 'cart' with your cart URL name
 
+    # Calculate total amount
     total_amount = sum(item.total_price() for item in cart_items)
 
     if request.method == "POST":
-        form = ShippingForm(request.POST)
-        if form.is_valid():
-            shipping_address = form.cleaned_data["address"]
-            order = Order.objects.create(
-                user=request.user,
-                total_price=total_amount,
-                shipping_address=shipping_address,
-            )
+        address = request.POST.get("address")
+        if not address:
+            messages.error(request, "Please provide a shipping address.")
+            return redirect('cart')
 
-            # FIX: Add OrderItems with correct quantity
-            for cart_item in cart_items:
-                OrderItem.objects.create(
-                    order=order,
-                    product=cart_item.product,
-                    quantity=cart_item.quantity  # use cart quantity
-                )
+        # Temporarily store order information in session
+        request.session['order_data'] = {
+            'total_amount': str(total_amount),
+            'address': address,
+            'cart_items': list(cart_items.values('product_id', 'quantity'))  # Store necessary data
+        }
 
-            cart_items.delete()
-            return redirect("order_summary", order_id=order.id)
-    else:
-        form = ShippingForm()
+        # Redirect to payment page
+        return redirect('initiate_payment')
 
-    return render(request, "accounts/checkout.html", {
-        "form": form,
-        "total_amount": total_amount,
-        "cart_items": cart_items,
-    })
+    return render(request, 'accounts/checkout.html', {'cart_items': cart_items, 'total_amount': total_amount})
 
-
-# Order Summary View
 @login_required
 def order_summary(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    order_items = OrderItem.objects.filter(order=order)
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    items = OrderItem.objects.filter(order=order)
 
-    context = {
+    return render(request, 'accounts/order_summary.html', {
         'order': order,
-        'order_items': order_items,
-        'total_price': order.total_price  # Use stored total_price directly
+        'items': items
+    })
+
+#Payment
+SECRET_KEY = "8gBm/:&EnhH.1/q"
+
+import time
+from .utils import generate_signature 
+@login_required
+def initiate_payment(request):
+    # Fetch the user's cart
+    cart = Cart.objects.filter(user=request.user)
+
+    if not cart:
+        messages.error(request, "Your cart is empty.")
+        return redirect('user_dashboard')
+
+    # Calculate the total price of the cart items
+    total_price = sum(item.product.price * item.quantity for item in cart)
+
+    # Create a temporary order and store it in the session for tracking
+    transaction_uuid = f"ORDER{uuid.uuid4()}_{int(time.time())}"
+
+    request.session['order_temp'] = {
+        'total_price': str(total_price),  # Convert to string to avoid Decimal issue
+        'transaction_uuid': transaction_uuid,
+        'cart_items': list(cart.values('product', 'quantity'))  # Storing cart items temporarily
     }
-    return render(request, 'accounts/order_summary.html', context)
+
+    # Generate the eSewa payment signature
+    signature = generate_signature(
+        SECRET_KEY,
+        total_price,
+        transaction_uuid,
+        "EPAYTEST"
+    )
+
+    # Convert total_price to a string with 2 decimal places for proper formatting
+    total_price_str = str(total_price.quantize(Decimal('0.00')))  # Ensure it's formatted correctly
+
+    params = {
+        'amt': total_price_str,  # Ensure amt is a string
+        'txAmt': '0',  # Transaction amount
+        'psc': '0',    # Payment service charge
+        'pdc': '0',    # Payment delivery charge
+        'tAmt': total_price_str,  # Total amount as string
+        'pid': transaction_uuid,
+        'scd': 'EPAYTEST',  # Merchant code
+        'su': f"http://localhost:8000/accounts/payment_success/{transaction_uuid}/",
+        'fu': f"http://localhost:8000/accounts/payment_failure/",
+        'signature': signature,
+    }
+
+    return render(request, 'accounts/payment_form.html', params)
+
+
+@login_required
+def payment_success(request, order_id):
+    try:
+        # Fetch order data from session (pending order)
+        temp_order = request.session.get('order_data')  # Use 'order_data' instead of 'order_temp'
+        if not temp_order:
+            messages.error(request, "Invalid order session.")
+            return redirect('user_dashboard')
+
+        amt = request.GET.get('amt')  # Amount paid
+        refId = request.GET.get('refId')  # Transaction reference ID
+
+        if amt and refId:
+            # Now, create the actual order and save it in the database
+            order = Order(
+                user=request.user,
+                shipping_address=temp_order.get('address', ''),  # Retrieve address from session
+                total_price=temp_order['total_amount'],
+                status="Confirmed",  # Mark it as confirmed because payment is successful
+                transaction_code=order_id
+            )
+            order.save()
+
+            # Add order items
+            for cart_item in temp_order['cart_items']:
+                OrderItem.objects.create(
+                    order=order,
+                    product_id=cart_item['product_id'],  # Assuming you stored product_id in session
+                    quantity=cart_item['quantity']
+                )
+
+            # Save payment details in the database
+            Payment.objects.create(
+                order=order,
+                payment_method="eSewa",
+                transaction_id=refId,
+                amount=amt,
+                payment_status="Paid"
+            )
+
+            # Clear session data since the order is finalized
+            del request.session['order_data']
+
+            # Clear the cart items
+            Cart.objects.filter(user=request.user).delete()
+
+            messages.success(request, "Payment successful!")
+
+            return render(request, 'accounts/payment_success.html', {
+                'order': order,
+                'booking_code': order_id
+            })
+
+    except Exception as e:
+        print(f"[Error] Payment failure: {e}")
+        messages.error(request, "Invalid order code or payment failed.")
+        return redirect('user_dashboard')
+
+    return render(request, 'accounts/payment_success.html', {
+        'order': order,
+        'booking_code': order_id
+    })
+    
+
+
+@login_required
+def payment_failure(request):
+    messages.error(request, "Payment failed. Please try again.")
+    return redirect('user_dashboard')
+
+
+@login_required
+def user_orders(request):
+    orders = Order.objects.filter(user=request.user).order_by('-order_date')
+    return render(request, 'accounts/user_orders.html', {'orders': orders})
 
 @login_required
 def profile_view(request):
@@ -462,66 +571,29 @@ def profile_view(request):
     
     return render(request, "accounts/profile.html", {"form": form, "user": user})
 
+def admin_orders(request):
+    orders = Order.objects.select_related('user').order_by('-order_date')
+    return render(request, 'accounts/admin_orders.html', {'orders': orders})
 
-@login_required
-@login_required
-def user_orders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-order_date')
-    return render(request, 'accounts/user_orders.html', {'orders': orders})
 
-@login_required
-def admin_manage_orders(request):
-    """Admin view to list all orders with filtering option."""
-    if not request.user.is_admin:
-        messages.error(request, "Unauthorized access!")
-        return redirect("home")
-
-    # Get the filter value from the GET request (if any)
-    status_filter = request.GET.get('status_filter', '')
-
-    # Apply filtering if a status filter is provided
-    if status_filter:
-        orders = Order.objects.filter(status=status_filter).order_by("-order_date")
-    else:
-        orders = Order.objects.all().order_by("-order_date")
-    #paginator
-    paginator=Paginator(orders,3)
-    page=request.GET.get("page")
-    try:
-        orders = paginator.page(page)
-    except PageNotAnInteger:
-        orders = paginator.page(1)
-    except EmptyPage:
-        orders = paginator.page(paginator.num_pages)
-
-    return render(request, "accounts/manage_orders.html", {"orders": orders, "status_filter": status_filter})
-
-@login_required
-def admin_order_detail(request, order_id):
-    """Admin view to see order details."""
-    if not request.user.is_admin:
-        messages.error(request, "Unauthorized access!")
-        return redirect("home")
-
+def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    order_items = OrderItem.objects.filter(order=order)
-    
-    return render(request, "accounts/order_detail.html", {"order": order, "order_items": order_items})
+    items = OrderItem.objects.filter(order=order)
+    payment = Payment.objects.filter(order=order).first()
+    return render(request, 'accounts/order_detail.html', {
+        'order': order,
+        'items': items,
+        'payment': payment,
+    })
 
-@login_required
-def admin_update_order_status(request, order_id):
-    """Admin updates order status."""
-    if not request.user.is_admin:
-        messages.error(request, "Unauthorized access!")
-        return redirect("home")
-
-    order = get_object_or_404(Order, id=order_id)
-    
-    if request.method == "POST":
-        new_status = request.POST.get("status")
-        order.status = new_status
-        order.save()
-        messages.success(request, f"Order #{order.id} status updated to {new_status}.")
-        return redirect("admin_manage_orders")
-    
-    return render(request, "accounts/update_order_status.html", {"order": order})
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        status = request.POST.get('status')
+        if status in ['Pending', 'Shipped', 'Delivered']:
+            order.status = status
+            order.save()
+            messages.success(request, f'Order status updated to {status}')
+        else:
+            messages.error(request, 'Invalid status.')
+    return redirect('order_detail', order_id=order_id)

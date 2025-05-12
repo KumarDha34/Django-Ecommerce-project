@@ -42,6 +42,7 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     shipping_address = models.TextField()
     order_date = models.DateTimeField(auto_now_add=True)
+    transaction_code = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(
         max_length=20,
         choices=[("Pending", "Pending"), ("Shipped", "Shipped"), ("Delivered", "Delivered")],
@@ -59,3 +60,12 @@ class OrderItem(models.Model):
     @property
     def item_total(self):
         return self.product.price * self.quantity
+    
+
+class Payment(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    payment_method = models.CharField(max_length=50)
+    transaction_id = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)

@@ -4,14 +4,14 @@ from .views import (
     user_dashboard, admin_dashboard, index,
     add_category, manage_categories,user_list,delete_user,add_product,manage_products,category_products,
     product_detail,view_cart,view_wishlist,add_to_cart,add_to_wishlist,remove_from_cart,update_cart,remove_from_wishlist,
-    move_to_cart,checkout,profile_view,order_summary,user_orders,edit_category,edit_product,delete_category,delete_product,
-    admin_manage_orders,admin_order_detail,admin_update_order_status
+    move_to_cart,edit_category,edit_product,delete_category,delete_product,
 )
 from accounts import views
 urlpatterns = [
     path('', index, name='index'),
     path('signup/', signup, name='signup'),
     path('user_login/', user_login, name='user_login'),
+    path('login/', user_login, name='login'),
     path('admin_login/', admin_login, name='admin_login'),
     path('logout/', logout_view, name='logout'),
     path('user_dashboard/', user_dashboard, name='user_dashboard'),
@@ -37,11 +37,18 @@ urlpatterns = [
     path("wishlist/add/<int:product_id>/", add_to_wishlist, name="add_to_wishlist"),
     path("wishlist/remove/<int:product_id>/", remove_from_wishlist, name="remove_from_wishlist"),
     path("wishlist/move-to-cart/<int:product_id>/", move_to_cart, name="move_to_cart"),
-    path("checkout/", checkout, name="checkout"),
-    path('order-summary/<int:order_id>/',order_summary,name='order_summary'),
-    path("profile/", profile_view, name="profile"),
-    path('orders/',user_orders,name='user_orders'),
-    path("admin/orders/", admin_manage_orders, name="admin_manage_orders"),
-    path("admin/orders/<int:order_id>/", admin_order_detail, name="admin_order_detail"),
-    path("admin/orders/<int:order_id>/update/", admin_update_order_status, name="admin_update_order_status"),
+    #Checkout
+    path('checkout/', views.proceed_to_checkout, name='proceed_to_checkout'),
+    path('order-summary/<int:order_id>/', views.order_summary, name='order_summary'),
+    #Payment
+    path('payment/initiate/', views.initiate_payment, name='initiate_payment'),
+    path('payment_success/<str:order_id>/', views.payment_success, name='payment_success'),
+    path('payment/failure/', views.payment_failure, name='payment_failure'),
+    #User Order
+    path('my-orders/', views.user_orders, name='user_orders'),
+    path("profile/", views.profile_view, name="profile"),
+    #Manage Order
+    path('admin/orders/', views.admin_orders, name='admin_orders'),
+    path('admin/orders/<int:order_id>/', views.order_detail, name='order_detail'),
+    path('admin/orders/<int:order_id>/update/', views.update_order_status, name='update_order_status'),
 ]
