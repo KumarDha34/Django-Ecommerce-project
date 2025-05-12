@@ -1,186 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <!-- Link to Font Awesome for Icons -->
+    <meta charset="UTF-8">
+    <title>Wishlist - ShopNow</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            text-align: center;
-            margin: 0;
-            padding-top: 80px;
-            transition: background-color 0.3s ease;
-        }
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to right, #dceefb, #f5f7fa);
+      padding: 30px;
+      animation: fadeIn 1s ease-in-out;
+      color: #333;
+      padding-top: 80px; /* Space for fixed navbar */
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        h2 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 15px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
 
-        header {
-            height: 80px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            transition: box-shadow 0.3s ease-in-out;
-            border-bottom: 1px solid #ddd;
-        }
+    header h2 {
+      font-size: 22px;
+      color: #333;
+    }
 
-        header.scrolled {
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
 
-        nav {
-            margin-right: 100px;
-        }
+    nav ul li {
+      position: relative;
+    }
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
+    nav ul li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
 
-        nav ul li {
-            display: inline-block;
-            position: relative;
-            text-decoration: none;
-        }
+    nav ul li a:hover {
+      color: #007bff;
+      transform: scale(1.1);
+    }
 
-        nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-            padding: 8px 15px;
-            transition: 0.3s;
-            font-size: 16px;
-        }
+    .profile-img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
 
-        nav ul li a:hover {
-            color: #007bff;
-            transform: translateY(-2px);
-        }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      min-width: 180px;
+      text-align: left;
+      z-index: 1000;
+    }
 
-        .dropdown {
-            position: relative;
-            cursor: pointer;
-        }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
 
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: white;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            min-width: 180px;
-            text-align: left;
-            z-index: 1000;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
+    .dropdown-content a {
+      display: block;
+      padding: 10px;
+      color: #333;
+      text-decoration: none;
+    }
 
-        .dropdown-content a {
-            display: block;
-            padding: 10px;
-            color: #333;
-            text-decoration: none;
-        }
+    .dropdown-content a:hover {
+      background: #f1f1f1;
+    }
 
-        .dropdown-content a:hover {
-            background: #f4f4f4;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .btn {
-            background: #007bff;
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background 0.3s, transform 0.2s;
-        }
-
-        .btn:hover {
-            background: #0056b3;
-            transform: scale(1.05);
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
         }
 
         .wishlist-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
-            background: white;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
         }
 
-        .wishlist-container:hover {
-            transform: scale(1.02);
+        .wishlist-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease;
+            transition: transform 0.2s ease-in-out;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 50px;
+        .wishlist-card:hover {
+            transform: translateY(-5px);
         }
 
-        th, td {
-            padding: 15px;
-            text-align: center;
-            font-size: 16px;
-            color: #555;
+        .wishlist-info {
+            text-align: left;
         }
 
-        th {
-            background-color: #007bff;
-            color: white;
-            font-size: 18px;
+        .wishlist-info h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #222;
         }
 
-        td {
-            background-color: #fff;
-            transition: background 0.3s ease-in-out;
+        .wishlist-info p {
+            color: #666;
         }
 
-        tr:hover td {
-            background-color: #f1f1f1;
-        }
-
-        a {
+        .wishlist-actions a {
+            margin-left: 10px;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            color: #fff;
             text-decoration: none;
-            font-weight: bold;
-            padding: 8px 15px;
-            border-radius: 6px;
-            transition: all 0.3s ease-in-out;
-            display: inline-block;
-            margin: 5px 10px;
-        }
-
-        a:hover {
-            transform: translateY(-2px);
+            transition: 0.3s ease-in-out;
         }
 
         .move-to-cart {
             background-color: #28a745;
-            color: white;
         }
 
         .move-to-cart:hover {
@@ -189,108 +164,108 @@
 
         .remove {
             background-color: #dc3545;
-            color: white;
         }
 
         .remove:hover {
             background-color: #c82333;
         }
 
-        /* Icon Styling */
-        .nav-icon {
-            margin-right: 8px;
+        .empty-wishlist {
+            text-align: center;
+            margin-top: 100px;
+            color: #777;
+        }
+
+        .empty-wishlist p {
             font-size: 18px;
-            transition: transform 0.3s ease;
+            margin: 15px 0;
         }
 
-        .nav-icon:hover {
-            transform: rotate(15deg);
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
         }
 
-        /* Profile Image */
-        .profile-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media screen and (max-width: 600px) {
+            .wishlist-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .wishlist-actions {
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 
+<body>
 <header>
-    <h2>Welcome, {{ request.user.username }}</h2>
+    <h2><i class="fas fa-user-circle"></i> Welcome, {{ request.user.username }}</h2>
     <nav>
-        <ul>
-            <li class="dropdown">
-                <a href="{% url 'user_dashboard' %}">
-                    <i class="fas fa-boxes nav-icon"></i> All Products ▼
-                </a>
-                <div class="dropdown-content">
-                    {% if categories %}
-                        {% for category in categories %}
-                            <a href="{% url 'category_products' category.id %}">
-                                <i class="fas fa-tag nav-icon"></i> {{ category.name }}
-                            </a>
-                        {% endfor %}
-                    {% else %}
-                        <a href="#">No categories available</a>
-                    {% endif %}
-                </div>
-            </li>
-            <li>
-                <a href="{% url 'cart' %}">
-                    <i class="fas fa-shopping-cart nav-icon"></i> Cart
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'wishlist' %}">
-                    <i class="fas fa-heart nav-icon"></i> Wishlist
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'user_orders' %}">
-                    <i class="fas fa-box nav-icon"></i> Orders
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'profile' %}">
-                    <img src="{{ request.user.profile_picture.url }}" alt="Profile" class="profile-img">
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'logout' %}">
-                    <i class="fas fa-sign-out-alt nav-icon"></i> Logout
-                </a>
-            </li>
-        </ul>
+      <ul>
+        <li class="dropdown">
+          <a href="{% url 'user_dashboard' %}"><i class="fas fa-th-large"></i> Categories ▼</a>
+          <div class="dropdown-content">
+            {% if categories %}
+              {% for category in categories %}
+                <a href="{% url 'category_products' category.id %}">{{ category.name }}</a>
+              {% endfor %}
+            {% else %}
+              <a href="#">No categories</a>
+            {% endif %}
+          </div>
+        </li>
+        <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+        <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
+        <li><a href="{% url 'user_orders' %}"><i class="fas fa-box-open"></i> Orders</a></li>
+        <li><a href="{% url 'profile' %}"><img src="{{ request.user.profile_picture.url }}" alt="Profile" class="profile-img" /></a></li>
+        <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
     </nav>
-</header>
+  </header>
 
 {% if wishlist_items %}
-    <div class="wishlist-container">
-        <table>
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-            {% for item in wishlist_items %}
-                <tr>
-                    <td>{{ item.product.name }}</td>
-                    <td>Rs. {{ item.product.price }}</td>
-                    <td>
-                        <a href="{% url 'move_to_cart' item.product.id %}" class="move-to-cart">
-                            <i class="fas fa-cart-plus nav-icon"></i> Move to Cart
-                        </a> |
-                        <a href="{% url 'remove_from_wishlist' item.product.id %}" class="remove">
-                            <i class="fas fa-trash nav-icon"></i> Remove
-                        </a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
+<div class="wishlist-container">
+    {% for item in wishlist_items %}
+        <div class="wishlist-card">
+            <div class="wishlist-info">
+                <h3>{{ item.product.name }}</h3>
+                <p>Rs. {{ item.product.price }}</p>
+            </div>
+            <div class="wishlist-actions">
+                <a href="{% url 'move_to_cart' item.product.id %}" class="move-to-cart">
+                    <i class="fas fa-cart-plus"></i> Move to Cart
+                </a>
+                <a href="{% url 'remove_from_wishlist' item.product.id %}" class="remove">
+                    <i class="fas fa-trash"></i> Remove
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
 {% else %}
-    <p>Your wishlist is empty.</p>
+    <div class="empty-wishlist">
+        <i class="fas fa-heart-broken fa-3x" style="color: #dc3545;"></i>
+        <p>Your wishlist is empty.</p>
+        <a href="{% url 'user_dashboard' %}" class="btn">
+            <i class="fas fa-shopping-bag"></i> Continue Shopping
+        </a>
+    </div>
 {% endif %}
 
 <script>
@@ -303,3 +278,5 @@
         }
     });
 </script>
+</body>
+</html>
