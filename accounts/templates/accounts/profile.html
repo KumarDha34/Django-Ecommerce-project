@@ -8,120 +8,105 @@
     <style>
         /* Global Styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #dceefb, #f5f7fa);
+            padding: 30px;
+            animation: fadeIn 1s ease-in-out;
+            color: #333;
+            padding-top: 80px; /* Space for fixed navbar */
+        }
+        
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            box-sizing: border-box;
         }
 
-        /* Header */
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: rgba(255, 255, 255, 0.95);
-        padding: 15px 50px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 1000;
-        transition: box-shadow 0.3s ease-in-out;
-    }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    header.scrolled {
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    }
-    nav{
-        margin-right: 100px;
-        
-    }
-    nav ul {
-        list-style: none;
-        display: flex;
-        gap: 20px;
-        align-items: center;
-        
-    }
+        header h2 {
+            font-size: 22px;
+            color: #333;
+        }
 
-    nav ul li {
-        display: inline-block;
-        position: relative;
-    }
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
 
-    nav ul li a {
-        text-decoration: none;
-        color: #333;
-        font-weight: bold;
-        padding: 8px 12px;
-        transition: 0.3s;
-    }
+        nav ul li {
+            position: relative;
+        }
 
-    nav ul li a:hover {
-        color: #007bff;
-    }
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
 
-    .btn {
-        background: #007bff;
-        color: #fff;
-        padding: 8px 15px;
-        border-radius: 5px;
-        text-decoration: none;
-        transition: background 0.3s, transform 0.2s;
-    }
+        nav ul li a:hover {
+            color: #007bff;
+            transform: scale(1.1);
+        }
 
-    .btn:hover {
-        background: #0056b3;
-        transform: scale(1.05);
-    }
+        .profile-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
 
-    /* Dropdown */
-    .dropdown {
-        position: relative;
-        cursor: pointer;
-    }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 180px;
+            text-align: left;
+            z-index: 1000;
+        }
 
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        background: white;
-        border-radius: 5px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        min-width: 180px;
-        text-align: left;
-        z-index: 1000;
-        opacity: 0;
-        transform: translateY(10px);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-    }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
 
-    .dropdown-content a {
-        display: block;
-        padding: 10px;
-        color: #333;
-        text-decoration: none;
-    }
+        .dropdown-content a {
+            display: block;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+        }
 
-    .dropdown-content a:hover {
-        background: #f4f4f4;
-    }
-
-    .dropdown:hover .dropdown-content {
-        display: block;
-        opacity: 1;
-        transform: translateY(0);
-    }
+        .dropdown-content a:hover {
+            background: #f1f1f1;
+        }
 
         .profile-container {
-            margin-top: 360px;
+            margin-top: 140px;
             max-width: 400px;
             background: white;
+            margin-left: 500px;
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
@@ -210,37 +195,50 @@
             color: #0056b3;
             text-decoration: underline;
         }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .profile-container {
+                margin-top: 80px;
+                width: 90%;
+            }
+
+            header h2 {
+                font-size: 18px;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
-        <h2>Welcome, {{ request.user.username }}</h2>
+        <h2><i class="fas fa-user-circle"></i> Welcome, {{ request.user.username }}</h2>
         <nav>
             <ul>
                 <li class="dropdown">
-                    <a href="{% url 'user_dashboard' %}">All Products ▼</a>
+                    <a href="{% url 'user_dashboard' %}"><i class="fas fa-th-large"></i> Categories ▼</a>
                     <div class="dropdown-content">
                         {% if categories %}
                             {% for category in categories %}
                                 <a href="{% url 'category_products' category.id %}">{{ category.name }}</a>
                             {% endfor %}
                         {% else %}
-                            <a href="#">No categories available</a>
+                            <a href="#">No categories</a>
                         {% endif %}
                     </div>
                 </li>
-                <li><a href="{% url 'cart' %}">Cart</a></li>
-                <li><a href="{% url 'wishlist' %}">Wishlist</a></li>
-                <li><a href="{% url 'user_orders' %}">Orders</a></li>
-                <li>
-                    <a href="{% url 'profile' %}">
-                      <img src="{{ request.user.profile_picture.url }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
-                      </a>
-                  </li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
+                <li><a href="{% url 'user_orders' %}"><i class="fas fa-box-open"></i> Orders</a></li>
+                <li><a href="{% url 'profile' %}"><img src="{{ request.user.profile_picture.url }}" alt="Profile" class="profile-img" /></a></li>
+                <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
     </header>
+
     <div class="profile-container">
         <h2>My Profile</h2>
         <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
@@ -252,7 +250,7 @@
             {{ form.as_p }}
             <button type="submit">Update Profile</button>
         </form>
-        <br>
+        <a href="{% url 'user_dashboard' %}">Back to Dashboard</a>
     </div>
 </body>
 </html>
