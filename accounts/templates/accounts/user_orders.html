@@ -2,184 +2,301 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Your Orders - ShopNow</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopNow - Best Online Shopping</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+  />
   <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to right, #dceefb, #f5f7fa);
-      padding: 30px;
-      animation: fadeIn 1s ease-in-out;
+      background: #f5f5f5;
+      padding-top: 80px;
+      font-size: 16px;
       color: #333;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .order-container {
-      max-width: 1100px;
-      margin: auto;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 12px 24px rgba(0,0,0,0.08);
-      animation: slideIn 0.8s ease-in-out;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: scale(0.98); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #2c3e50;
-      font-size: 30px;
-      font-weight: 700;
-    }
-
-    .order-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      margin-bottom: 25px;
-      padding: 20px;
-      transition: box-shadow 0.3s ease;
-    }
-
-    .order-card:hover {
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-    }
-
-    .order-header {
+    /* Header Styles */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 15px 50px;
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    header h2 {
+      font-size: 22px;
+      color: #333;
+    }
+
+    header.scrolled {
+      background-color: #007bff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    nav ul li {
+      position: relative;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      transition: color 0.3s ease, transform 0.3s ease;
+      font-size: 16px;
+    }
+
+    nav ul li a:hover {
+      color: #007bff;
+      transform: scale(1.1);
+    }
+
+    .profile-img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      min-width: 180px;
+      text-align: left;
+      z-index: 1000;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .dropdown-content a {
+      display: block;
+      padding: 12px;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+      border-bottom: 1px solid #f1f1f1;
+    }
+
+    .dropdown-content a:hover {
+      background: #f1f1f1;
+    }
+
+    /* Order Page Styles */
+    .order-container {
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 1000px;
+      margin: 20px auto;
+    }
+
+    .order-container h3 {
+      font-size: 1.2rem;
+      font-weight: bold;
       margin-bottom: 15px;
     }
 
-    .order-header span {
-      font-size: 15px;
-      margin: 4px 0;
-    }
-
-    .order-header .status {
+    .order-status {
+      font-weight: bold;
+      color: #fff;
       padding: 6px 12px;
-      background-color: #e3f2fd;
-      color: #1976d2;
+      border-radius: 25px;
+      text-transform: capitalize;
+    }
+
+    .status-delivered {
+      background-color: #28a745;
+    }
+
+    .status-shipped {
+      background-color: #ff9800;
+    }
+
+    .status-pending {
+      background-color: #6c757d;
+    }
+
+    .order-items {
+      margin-top: 20px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .order-items li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    .order-items li img {
+      width: 60px;
+      height: 60px;
       border-radius: 8px;
-      font-weight: 500;
+      object-fit: cover;
+      margin-right: 15px;
     }
 
-    .items-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      border-radius: 8px;
-      overflow: hidden;
+    .order-items li .item-info {
+      flex: 1;
     }
 
-    .items-table th, .items-table td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 14px;
-      text-align: center;
+    .order-items li .item-info strong {
+      font-size: 1.1rem;
+      color: #007bff;
     }
 
-    .items-table th {
-      background-color: #f8f9fa;
-      color: #555;
-      font-weight: 600;
+    .order-items li .item-info span {
+      font-size: 1rem;
+      color: #666;
     }
 
-    .items-table tr:last-child td {
-      border-bottom: none;
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      list-style: none;
     }
 
-    .back-btn {
-      display: block;
-      margin: 30px auto 0;
-      padding: 12px 24px;
-      background: linear-gradient(to right, #007bff, #0056b3);
-      color: white;
-      border-radius: 6px;
+    .pagination li {
+      margin: 0 5px;
+    }
+
+    .pagination a {
+      padding: 10px 20px;
+      background: white;
+      color: #007bff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
       text-decoration: none;
-      font-weight: 500;
-      transition: background 0.3s ease, transform 0.2s ease;
-      text-align: center;
-      max-width: 240px;
+      font-weight: bold;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
-    .back-btn:hover {
-      background: linear-gradient(to right, #0056b3, #003f7f);
-      transform: translateY(-2px);
+    .pagination a:hover {
+      background: #007bff;
+      color: white;
     }
 
-    .no-orders {
-      text-align: center;
-      font-size: 16px;
-      color: #555;
-      margin-top: 30px;
-      font-weight: 500;
+    .pagination .active {
+      background: #007bff;
+      color: white;
+      font-weight: bold;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .order-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .order-header span {
-        font-size: 14px;
-      }
+    /* Hover/Animation Effects */
+    .order-container:hover {
+      transform: scale(1.02);
+      transition: transform 0.3s ease;
+    }
+
+    .pagination a:active {
+      transform: scale(0.95);
     }
   </style>
 </head>
 <body>
-  <div class="order-container">
-    <h2>Your Orders</h2>
-    {% if orders %}
-      {% for order in orders %}
-        <div class="order-card">
-          <div class="order-header">
-            <span><strong>Order ID:</strong> #{{ order.id }}</span>
-            <span><strong>Date:</strong> {{ order.order_date|date:"F j, Y, g:i a" }}</span>
-            <span><strong>Total:</strong> Rs. {{ order.total_price }}</span>
-            <span class="status">{{ order.status }}</span>
-          </div>
-          <div>
-            <span><strong>Shipping Address:</strong> {{ order.shipping_address }}</span>
-          </div>
-
-          <table class="items-table">
-            <thead>
-              <tr>
-                <th>Product Name</th>
-                <th>Quantity</th>
-                <th>Price (Rs.)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in order.orderitem_set.all %}
-              <tr>
-                <td>{{ item.product.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.item_total }}</td>
-              </tr>
+  <header>
+    <h2><i class="fas fa-user-circle"></i> Welcome, {{ request.user.username }}</h2>
+    <nav>
+      <ul>
+        <li class="dropdown">
+          <a href="{% url 'user_dashboard' %}"><i class="fas fa-th-large"></i> Categories ▼</a>
+          <div class="dropdown-content">
+            {% if categories %}
+              {% for category in categories %}
+                <a href="{% url 'category_products' category.id %}">{{ category.name }}</a>
               {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% endfor %}
-    {% else %}
-      <p class="no-orders">You have no orders yet.</p>
-    {% endif %}
-    <a href="{% url 'user_dashboard' %}" class="back-btn">⬅ Back to Dashboard</a>
-  </div>
+            {% else %}
+              <a href="#">No categories</a>
+            {% endif %}
+          </div>
+        </li>
+        <li><a href="{% url 'cart' %}"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+        <li><a href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
+        <li><a href="{% url 'user_orders' %}"><i class="fas fa-box-open"></i> Orders</a></li>
+        <li><a href="{% url 'profile' %}"><img src="{{ request.user.profile_picture.url }}" alt="Profile" class="profile-img" /></a></li>
+        <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <h2 style="text-align: center; margin-top: 120px;">My Orders</h2>
+
+  {% if orders %}
+    {% for order in orders %}
+      <div class="order-container">
+        <h3>Order ID: {{ order.id }} | Status: <span class="order-status {% if order.status == 'Delivered' %}status-delivered{% elif order.status == 'Shipped' %}status-shipped{% else %}status-pending{% endif %}">{{ order.status }}</span></h3>
+        <p><strong>Date:</strong> {{ order.order_date|date:"F d, Y H:i" }}</p>
+        <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+        <p><strong>Total Price:</strong> Rs.{{ order.total_price }}</p>
+        <p><strong>Transaction Code:</strong> {{ order.transaction_code|default:"N/A" }}</p>
+
+        <h4>Items:</h4>
+        <ul class="order-items">
+          {% for item in order.orderitem_set.all %}
+            <li>
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" />
+              <div class="item-info">
+                <strong>{{ item.product.name }}</strong><br />
+                Quantity: {{ item.quantity }}<br />
+                Price: Rs.{{ item.product.price }}<br />
+                Subtotal: Rs.{{ item.item_total }}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="text-align: center;">You have not placed any orders yet.</p>
+  {% endif %}
+
+  <script>
+    window.addEventListener('scroll', function () {
+      let header = document.querySelector('header');
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  </script>
 </body>
 </html>
